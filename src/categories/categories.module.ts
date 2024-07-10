@@ -3,7 +3,7 @@ import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Category, CategorySchema } from './models/category';
-import { ParentCategory } from './models/parent_category';
+import { ParentCategory, ParentCategorySchema } from './models/parent_category';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { ParentCategory } from './models/parent_category';
         name: Category.name, schema: CategorySchema
       },
       {
-        name: ParentCategory.name, schema: ParentCategory
+        name: ParentCategory.name, schema: ParentCategorySchema
       }
     ])
   ],

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ChallengueService } from './challengue.service';
 import { MerchatFavorite } from './models/favorite_payment';
 import { CreateFavoriteMerchatDto } from './dto/favorite_merchat.dto';
@@ -9,15 +9,28 @@ import { SearchMerchantDTO } from './dto/search_merchant.dto';
 export class ChallengueController {
   constructor(private readonly challengueService: ChallengueService) { }
 
+  @Delete('favorites/merchant/:id')
+  async removeFavoriteMerchant(@Param('id') id: string): Promise<{ status: number; message: string }> {
+    const result = await this.challengueService.removeFavoriteMerchantById(id);
+    return {
+      status: 200,
+      message: result ? 'Merchant removed from favorites' : 'Merchant not found',
+    };
+  }
+
 
   @Get('favorites/merchant')
   async getFavoritesMerchants(): Promise<MerchatFavorite[]> {
-    return this.challengueService.getAllFavoritesMerchant();
+    return await this.challengueService.getAllFavoritesMerchant();
   }
 
-  @Post('search/merchant')
-  async searchMerchant(@Body() searchMerchantDTO: SearchMerchantDTO): Promise<Merchat[]> {
-    return this.challengueService.searchMerchantByTerm(searchMerchantDTO);
+  @Get('search/merchant')
+  async searchMerchant(@Query('searchTerm') searchTerm: string): Promise<{ status: number; data: Merchat[] }> {
+    const merchants = await this.challengueService.searchMerchantByTerm(searchTerm);
+    return {
+      status: 200,
+      data: merchants,
+    };
   }
 
   @Post('save/favorite-merchant')
@@ -26,9 +39,10 @@ export class ChallengueController {
     const merchantFavoriteSaved = await this.challengueService.saveNewFavoriteMerchat(createFavoriteMerchantDTO)
 
     if (!merchantFavoriteSaved) {
+      console.log("Merchant not created");
       return null
     }
-
+    console.log("Merchant  created");
     return merchantFavoriteSaved
 
   }

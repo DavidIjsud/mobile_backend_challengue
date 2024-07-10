@@ -16,11 +16,9 @@ export class ChallengueService {
   async saveNewFavoriteMerchat(merchatFavoriteDTO: CreateFavoriteMerchatDto): Promise<MerchatFavorite> | null {
 
     const { merchantId } = merchatFavoriteDTO;
-
     const merchantObjectId = new Types.ObjectId(merchantId);
-
     const merchant = await this.mertchatModel.findById(merchantObjectId).exec();
-
+    console.log("Merchat is", merchatFavoriteDTO)
     if (!merchant) {
       return null;
     }
@@ -31,22 +29,37 @@ export class ChallengueService {
       merchant_id: merchantObjectId
     })
 
-    return newFavoriteMerchant.save();
-
+    try {
+      return await newFavoriteMerchant.save();
+    } catch (error) {
+      console.log("Error on saving document", error);
+      return null
+    }
   }
 
-  async searchMerchantByTerm(searchMerchantByTermDto: SearchMerchantDTO): Promise<Merchat[]> {
+  async removeFavoriteMerchant(merchantId: string): Promise<boolean> {
+    const merchantObjectId = new Types.ObjectId(merchantId);
+    const result = await this.favoriteMerchatModel.deleteOne({ merchant_id: merchantObjectId }).exec();
+    return result.deletedCount > 0;
+  }
 
-    const { termn } = searchMerchantByTermDto;
+  async searchMerchantByTerm(termn: string): Promise<Merchat[]> {
     const regex = new RegExp(termn, 'i')
     const merchants = await this.mertchatModel.find({ name: { $regex: regex } }).exec();
     return merchants;
+  }
 
+  async removeFavoriteMerchantById(id: string): Promise<boolean> {
+    const objectId = new Types.ObjectId(id);
+    const result = await this.favoriteMerchatModel.deleteOne({ _id: objectId }).exec();
+    return result.deletedCount > 0;
   }
 
   async getAllFavoritesMerchant(): Promise<MerchatFavorite[]> {
 
-    return this.favoriteMerchatModel.find().exec();
+    const result = await this.favoriteMerchatModel.find().exec();
+    console.log('Favorites merchants :', result)
+    return result
 
   }
 

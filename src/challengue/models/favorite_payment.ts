@@ -4,7 +4,7 @@ import { Types, Document } from "mongoose";
 @Schema()
 export class MerchatFavorite extends Document {
 
-    @Prop({ type: Types.ObjectId, auto: true })
+
     _id: Types.ObjectId;
 
     @Prop({ required: true, })
@@ -13,7 +13,7 @@ export class MerchatFavorite extends Document {
     @Prop({ required: true, })
     payment_amount: number
 
-    @Prop({ type: Types.ObjectId, required: true, })
+    @Prop({ type: Types.ObjectId, required: true, unique: true })
     merchant_id: string;
 
 }
